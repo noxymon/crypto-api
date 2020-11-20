@@ -1,0 +1,12 @@
+jdbcSettings:
+  url: "jdbc:mariadb://localhost:3306/labs"
+  username: "root"
+  password: "12345678"
+  driverClassName: "org.mariadb.jdbc.Driver"
+outputDirectory: "src/main/java"
+packageName: "id.noxymon.miner.crawler.repository.entities"
+tableScanMode: 'RuleBased'
+tableScanRules:
+  - tableNames: ["tb_eth",
+                  "tb_eth_hour",
+                  "tb_model_linear"]
