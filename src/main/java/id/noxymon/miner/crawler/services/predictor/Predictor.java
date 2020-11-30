@@ -1,4 +1,4 @@
-package id.noxymon.miner.crawler.services;
+package id.noxymon.miner.crawler.services.predictor;
 
 import java.time.LocalDateTime;
 

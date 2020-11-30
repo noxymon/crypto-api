@@ -1,8 +1,12 @@
 package id.noxymon.miner.crawler.repository.entities;
 
-import java.sql.*;
-import javax.persistence.*;
 import lombok.Data;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import java.sql.Timestamp;
 
 @Data
 @Entity(name = "id.noxymon.miner.crawler.repository.entities.TbEthHour")

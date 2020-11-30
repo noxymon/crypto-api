@@ -1,20 +1,21 @@
-package id.noxymon.miner.crawler.learn;
+package id.noxymon.miner.crawler.plugins.predictor.linear;
 
-import id.noxymon.miner.crawler.services.predictor.LinearPredictor;
+import id.noxymon.miner.crawler.services.predictor.Predictor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
 @SpringBootTest
-public class TestLearn {
+class LinearPredictorHourTest {
 
     @Autowired
-    private LinearPredictor linearPredictor;
+    @Qualifier("linearPredictorHour")
+    private Predictor predictor;
 
     @Test
     public void testNearestPreviousTime(){
@@ -25,8 +26,8 @@ public class TestLearn {
 
     @Test
     public void testData(){
-        LocalDateTime testFutureTime = LocalDateTime.of(2020, 10, 2,11, 0);
-        final double futureValue = linearPredictor.predictFutureOf(testFutureTime);
-        Assertions.assertEquals(349.29588830774867, futureValue);
+        LocalDateTime testFutureTime = LocalDateTime.of(2020, 11, 22,20, 00);
+        final double futureValue = predictor.predictFutureOf(testFutureTime);
+        Assertions.assertEquals(7668000.0000, futureValue);
     }
 }

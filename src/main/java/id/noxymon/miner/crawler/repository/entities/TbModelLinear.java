@@ -1,9 +1,9 @@
 package id.noxymon.miner.crawler.repository.entities;
 
-import java.io.Serializable;
-import java.sql.*;
-import javax.persistence.*;
 import lombok.Data;
+
+import javax.persistence.*;
+import java.io.Serializable;
 
 @Data
 @Entity(name = "id.noxymon.miner.crawler.repository.entities.TbModelLinear")
