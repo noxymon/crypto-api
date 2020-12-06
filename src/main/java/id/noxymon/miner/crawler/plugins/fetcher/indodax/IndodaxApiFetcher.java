@@ -2,7 +2,6 @@ package id.noxymon.miner.crawler.plugins.fetcher.indodax;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import id.noxymon.miner.crawler.plugins.fetcher.summarizer.HourSummarizer;
 import id.noxymon.miner.crawler.plugins.fetcher.indodax.models.IndodaxApiResponse;
 import id.noxymon.miner.crawler.repository.EtheriumMinutesRepository;
 import id.noxymon.miner.crawler.repository.entities.TbEth;
@@ -30,7 +29,6 @@ public class IndodaxApiFetcher implements FetcherData {
 
     private final ObjectMapper objectMapper;
     private final RestTemplate restTemplate;
-    private final HourSummarizer hourSummarizer;
     private final EtheriumMinutesRepository etheriumMinutesRepository;
 
     @Value("${application.data.historical}")
@@ -51,7 +49,6 @@ public class IndodaxApiFetcher implements FetcherData {
         } catch (InterruptedException | JsonProcessingException e) {
             e.printStackTrace();
         }
-        hourSummarizer.summarize(startTime, targetTimeHour);
     }
 
     private void collectEtheriumPriceInMinutesInterval(String cryptoCurrency, LocalDateTime targetTimeHour, LocalDateTime startTime) throws InterruptedException, JsonProcessingException {
