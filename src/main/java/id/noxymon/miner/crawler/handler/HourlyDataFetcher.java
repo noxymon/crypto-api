@@ -21,7 +21,7 @@ public class HourlyDataFetcher {
     @Qualifier("indodaxApiFetcher")
     private FetcherData fetcherData;
 
-    @Scheduled(cron = "0 0 * * * *")
+    @Scheduled(cron = "${application.crawler.cron}")
     public void execute(){
         fetcherData.fetchData("ETHIDR", LocalDateTime.now());
     }
