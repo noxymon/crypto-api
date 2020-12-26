@@ -14,7 +14,7 @@ class IndodaxApiFetcherTest {
 
     @Test
     public void generateData(){
-        LocalDateTime startTime = LocalDateTime.of(2020,11,24,05,00);
+        LocalDateTime startTime = LocalDateTime.of(2020,11,19,15,00);
         LocalDateTime endTime = LocalDateTime.now();
         apiFetcher.fetchData("ETHIDR", startTime, endTime);
     }

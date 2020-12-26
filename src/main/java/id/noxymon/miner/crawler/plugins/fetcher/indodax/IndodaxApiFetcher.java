@@ -43,7 +43,7 @@ public class IndodaxApiFetcher implements FetcherData {
         fetchData(cryptoCurrency, startTime, targetTimeHour);
     }
 
-    protected void fetchData(String cryptoCurrency, LocalDateTime startTime, LocalDateTime targetTimeHour) {
+    public void fetchData(String cryptoCurrency, LocalDateTime startTime, LocalDateTime targetTimeHour) {
         try {
             collectEtheriumPriceInMinutesInterval(cryptoCurrency, targetTimeHour, startTime);
         } catch (InterruptedException | JsonProcessingException e) {
