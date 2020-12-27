@@ -3,10 +3,8 @@ package id.noxymon.miner.crawler.plugins.predictor.weka;
 import id.noxymon.miner.crawler.repository.EtheriumMinutesRepository;
 import id.noxymon.miner.crawler.repository.entities.TbEth;
 import id.noxymon.miner.crawler.services.predictor.MultiPredictor;
-import id.noxymon.miner.crawler.services.predictor.enums.DaysUnitPredictor;
-import id.noxymon.miner.crawler.services.predictor.enums.HoursUnitPredictor;
-import id.noxymon.miner.crawler.services.predictor.enums.MinutesUnitPredictor;
-import id.noxymon.miner.crawler.services.predictor.enums.TimeUnitEnum;
+import id.noxymon.miner.crawler.services.predictor.enums.TimeUnitPredictor;
+import id.noxymon.miner.crawler.services.predictor.models.PricePrediction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,7 +16,10 @@ import weka.filters.supervised.attribute.TSLagMaker;
 
 import java.sql.Timestamp;
 import java.text.ParseException;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -27,6 +28,7 @@ import java.util.List;
 @Service
 public class WekaPredictorSelector implements MultiPredictor {
 
+    private final ZoneId zone = ZoneId.of("Asia/Jakarta");
     private final Attribute low = new Attribute("low");
     private final Attribute open = new Attribute("open");
     private final Attribute high = new Attribute("high");
@@ -42,7 +44,7 @@ public class WekaPredictorSelector implements MultiPredictor {
     }
 
     @Override
-    public List<NumericPrediction> predictFutureOf(TimeUnitEnum unitTimes, int step) throws Exception {
+    public List<PricePrediction> predictFutureOf(TimeUnitPredictor unitTimes, int step) throws Exception {
         List<TbEth> historicalData = getHistoricalData(unitTimes);
         Instances dataset = composeDataset(unitTimes.getUnitTime(), historicalData);
 
@@ -54,35 +56,8 @@ public class WekaPredictorSelector implements MultiPredictor {
         return composeNumericPredictionList(step, forecaster);
     }
 
-    private List<TbEth> getHistoricalData(TimeUnitEnum unitTimes) {
-        if(unitTimes instanceof MinutesUnitPredictor){
-            return fetchHistoricalData((MinutesUnitPredictor) unitTimes);
-        }
-        if(unitTimes instanceof HoursUnitPredictor){
-            return fetchHistoricalData((HoursUnitPredictor) unitTimes);
-        }
-        if(unitTimes instanceof DaysUnitPredictor){
-            return fetchHistoricalData((DaysUnitPredictor) unitTimes);
-        }
-        throw new RuntimeException("Not Detected Unit Time !!");
-    }
-
-    private List<TbEth> fetchHistoricalData(MinutesUnitPredictor unitTimes) {
+    private List<TbEth> getHistoricalData(TimeUnitPredictor unitTimes) {
         return etheriumMinutesRepository.findRecordMinutePrediction(
-                Timestamp.valueOf(LocalDateTime.now()),
-                unitTimes.getMaxLagQuery(),
-                unitTimes.getUnitTime());
-    }
-
-    private List<TbEth> fetchHistoricalData(DaysUnitPredictor unitTimes) {
-        return etheriumMinutesRepository.findRecordDailyPrediction(
-                Timestamp.valueOf(LocalDateTime.now()),
-                unitTimes.getMaxLagQuery(),
-                unitTimes.getUnitTime());
-    }
-
-    private List<TbEth> fetchHistoricalData(HoursUnitPredictor unitTimes) {
-        return etheriumMinutesRepository.findRecordHourPrediction(
                 Timestamp.valueOf(LocalDateTime.now()),
                 unitTimes.getMaxLagQuery(),
                 unitTimes.getUnitTime());
@@ -90,6 +65,7 @@ public class WekaPredictorSelector implements MultiPredictor {
 
     private WekaForecaster buildForecaster(Instances dataset, LinearRegression linearRegression, int max) throws Exception {
         WekaForecaster forecaster = new WekaForecaster();
+        forecaster.reset();
         TSLagMaker lagMaker = forecaster.getTSLagMaker();
         lagMaker.setTimeStampField("date");
         lagMaker.setMinLag(1);
@@ -115,12 +91,40 @@ public class WekaPredictorSelector implements MultiPredictor {
         return linearRegression;
     }
 
-    private List<NumericPrediction> composeNumericPredictionList(int step, WekaForecaster forecaster) throws Exception {
-        List<NumericPrediction> numericPredictionList = new ArrayList<>();
+    private List<PricePrediction> composeNumericPredictionList(int step, WekaForecaster forecaster) throws Exception {
+        TSLagMaker tsLagMaker = forecaster.getTSLagMaker();
+        long currentTimeStampValue = (long)tsLagMaker.getCurrentTimeStampValue();
+        log.info("epoch in ms : " + currentTimeStampValue);
+
+        List<PricePrediction> numericPredictionList = new ArrayList<>();
         for (List<NumericPrediction> numericPredictions : forecaster.forecast(step, System.out)) {
-            numericPredictionList.add(numericPredictions.get(3));
+            LocalDateTime advancedLocalDateTime = getAdvancedLocalDateTime(tsLagMaker, currentTimeStampValue);
+
+            PricePrediction pricePrediction = new PricePrediction(
+                    numericPredictions.get(3).predicted(),
+                    advancedLocalDateTime.truncatedTo(ChronoUnit.MINUTES)
+            );
+            numericPredictionList.add(pricePrediction);
+
+            currentTimeStampValue = getAdvancedTimestampEpoch(tsLagMaker, currentTimeStampValue);
         }
         return numericPredictionList;
+    }
+
+    private LocalDateTime getAdvancedLocalDateTime(TSLagMaker tsLagMaker, long currentTimeStampValue) {
+        long advancedTimestampEpoch = getAdvancedTimestampEpoch(tsLagMaker, currentTimeStampValue);
+        return getLocalDateTimeFromEpoch(advancedTimestampEpoch);
+    }
+
+    private long getAdvancedTimestampEpoch(TSLagMaker tsLagMaker, long currentTimeStampValue) {
+        return Double.valueOf(tsLagMaker.advanceSuppliedTimeValue(currentTimeStampValue)).longValue();
+    }
+
+    private LocalDateTime getLocalDateTimeFromEpoch(long advancedTimestampEpoch) {
+        return Instant.ofEpochMilli(advancedTimestampEpoch)
+                .atZone(zone)
+                .toLocalDateTime()
+                .truncatedTo(ChronoUnit.MINUTES);
     }
 
     private Instances composeDataset(int unitMinutes, List<TbEth> recordInAvergaeMinute) {

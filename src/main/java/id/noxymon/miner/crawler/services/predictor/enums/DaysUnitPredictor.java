@@ -1,11 +1,11 @@
 package id.noxymon.miner.crawler.services.predictor.enums;
 
-public enum DaysUnitPredictor implements TimeUnitEnum {
+public enum DaysUnitPredictor implements TimeUnitPredictor {
 
-    THREE_DAYS(3,"3 hour", 32, 3),
-    SEVEN_DAYS(7,"7 hour", 32, 3),
-    FOURTEEN_DAYS(14,"14 hour", 32, 3),
-    THIRTY_DAYS(30,"30 hour", 32, 3);
+    THREE_DAYS(3,"3 hour", 96, 32),
+    SEVEN_DAYS(7,"7 hour", 96, 32),
+    FOURTEEN_DAYS(14,"14 hour", 96, 32),
+    THIRTY_DAYS(30,"30 hour", 96, 32);
 
     private final Integer unitTime;
     private final String description;

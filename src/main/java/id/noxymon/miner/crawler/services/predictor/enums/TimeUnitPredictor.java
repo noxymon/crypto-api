@@ -1,6 +1,6 @@
 package id.noxymon.miner.crawler.services.predictor.enums;
 
-public interface TimeUnitEnum {
+public interface TimeUnitPredictor {
     Integer getUnitTime();
     Integer getLagMakerMaxLag();
     Integer getMaxLagQuery();

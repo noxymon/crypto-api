@@ -15,14 +15,17 @@ import java.time.LocalDateTime;
 @Component
 @RequiredArgsConstructor
 @ConditionalOnProperty(value = "application.crawler.enable", havingValue = "true")
-public class HourlyDataFetcher {
+public class ScheduledDataFetcher {
 
     @Autowired
     @Qualifier("indodaxApiFetcher")
     private FetcherData fetcherData;
 
+    private final PredictorDataSaver predictorDataSaver;
+
     @Scheduled(cron = "${application.crawler.cron}")
     public void execute(){
         fetcherData.fetchData("ETHIDR", LocalDateTime.now());
+        predictorDataSaver.updatePrediction();
     }
 }

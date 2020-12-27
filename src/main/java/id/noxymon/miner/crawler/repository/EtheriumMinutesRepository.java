@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.stream.Stream;
 
 @Repository
 public interface EtheriumMinutesRepository extends JpaRepository<TbEth, Timestamp> {
@@ -25,8 +24,6 @@ public interface EtheriumMinutesRepository extends JpaRepository<TbEth, Timestam
                     "group by DATE_FORMAT(tbe_date, '%Y-%m-%d %H:00')"
     )
     List<TbEth> summarizeHourly(@Param("startTimestamp") Timestamp start, @Param("endTimestamp") Timestamp end);
-
-    List<TbEth> findAllByTbeDateBetweenOrderByTbeDateDesc(Timestamp maxHistoricalTimestamp, Timestamp previousMinutes);
 
     @Transactional(readOnly = true)
     @Query(nativeQuery = true,
