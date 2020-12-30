@@ -3,6 +3,9 @@ package id.noxymon.miner.crawler.plugins.predictor.weka;
 import id.noxymon.miner.crawler.repository.EtheriumMinutesRepository;
 import id.noxymon.miner.crawler.repository.entities.TbEth;
 import id.noxymon.miner.crawler.services.predictor.MultiPredictor;
+import id.noxymon.miner.crawler.services.predictor.enums.DaysUnitPredictor;
+import id.noxymon.miner.crawler.services.predictor.enums.HoursUnitPredictor;
+import id.noxymon.miner.crawler.services.predictor.enums.MinutesUnitPredictor;
 import id.noxymon.miner.crawler.services.predictor.enums.TimeUnitPredictor;
 import id.noxymon.miner.crawler.services.predictor.models.PricePrediction;
 import lombok.extern.slf4j.Slf4j;
@@ -57,7 +60,34 @@ public class WekaPredictorSelector implements MultiPredictor {
     }
 
     private List<TbEth> getHistoricalData(TimeUnitPredictor unitTimes) {
+        if(unitTimes instanceof MinutesUnitPredictor){
+            return fetchHistoricalData((MinutesUnitPredictor) unitTimes);
+        }
+        if(unitTimes instanceof HoursUnitPredictor){
+            return fetchHistoricalData((HoursUnitPredictor) unitTimes);
+        }
+        if(unitTimes instanceof DaysUnitPredictor){
+            return fetchHistoricalData((DaysUnitPredictor) unitTimes);
+        }
+        throw new RuntimeException("Not Detected Unit Time !!");
+    }
+
+    private List<TbEth> fetchHistoricalData(MinutesUnitPredictor unitTimes) {
         return etheriumMinutesRepository.findRecordMinutePrediction(
+                Timestamp.valueOf(LocalDateTime.now()),
+                unitTimes.getMaxLagQuery(),
+                unitTimes.getUnitTime());
+    }
+
+    private List<TbEth> fetchHistoricalData(DaysUnitPredictor unitTimes) {
+        return etheriumMinutesRepository.findRecordDailyPrediction(
+                Timestamp.valueOf(LocalDateTime.now()),
+                unitTimes.getMaxLagQuery(),
+                unitTimes.getUnitTime());
+    }
+
+    private List<TbEth> fetchHistoricalData(HoursUnitPredictor unitTimes) {
+        return etheriumMinutesRepository.findRecordHourPrediction(
                 Timestamp.valueOf(LocalDateTime.now()),
                 unitTimes.getMaxLagQuery(),
                 unitTimes.getUnitTime());
