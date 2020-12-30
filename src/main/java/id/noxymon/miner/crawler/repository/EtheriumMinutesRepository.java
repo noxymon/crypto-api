@@ -46,7 +46,7 @@ public interface EtheriumMinutesRepository extends JpaRepository<TbEth, Timestam
     @Transactional(readOnly = true)
     @Query(nativeQuery = true,
             value = "select " +
-                    "    `tb_eth`.`tbe_date` + interval :intervalHours minute AS `tbe_date`, " +
+                    "    `tb_eth`.`tbe_date` + interval :intervalHours hour AS `tbe_date`, " +
                     "    avg(`tb_eth`.`tbe_open`) AS `tbe_open`," +
                     "    avg(`tb_eth`.`tbe_high`) AS `tbe_high`," +
                     "    avg(`tb_eth`.`tbe_low`) AS `tbe_low`," +
