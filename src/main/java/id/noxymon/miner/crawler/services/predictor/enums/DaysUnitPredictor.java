@@ -27,7 +27,7 @@ public enum DaysUnitPredictor implements TimeUnitPredictor {
         return lagMakerMaxLag;
     }
 
-    public Integer getMaxLagQuery() {
+    public Integer getMaxHistoricalDataInterval() {
         return maxLagQuery;
     }
 }

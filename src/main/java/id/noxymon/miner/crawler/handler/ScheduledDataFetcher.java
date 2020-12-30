@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -21,11 +22,17 @@ public class ScheduledDataFetcher {
     @Qualifier("indodaxApiFetcher")
     private FetcherData fetcherData;
 
+    @Value("${application.prediction.enable}")
+    private boolean enablePrediction;
+
     private final PredictorDataSaver predictorDataSaver;
 
     @Scheduled(cron = "${application.crawler.cron}")
     public void execute(){
         fetcherData.fetchData("ETHIDR", LocalDateTime.now());
-        predictorDataSaver.updatePrediction();
+
+        if(enablePrediction){
+            predictorDataSaver.updatePrediction();
+        }
     }
 }

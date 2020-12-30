@@ -28,7 +28,7 @@ public enum MinutesUnitPredictor implements TimeUnitPredictor {
     }
 
     @Override
-    public Integer getMaxLagQuery() {
+    public Integer getMaxHistoricalDataInterval() {
         return maxLagQuery;
     }
 }

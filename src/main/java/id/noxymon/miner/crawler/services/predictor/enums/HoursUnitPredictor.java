@@ -10,13 +10,13 @@ public enum HoursUnitPredictor implements TimeUnitPredictor {
 
     private final Integer unitTime;
     private final String description;
-    private final Integer maxLagQuery;
+    private final Integer maxHistoricalDataInterval;
     private final Integer lagMakerMaxLag;
 
-    HoursUnitPredictor(Integer unitTime, String description, Integer maxLagQuery, Integer lagMakerMaxLag) {
+    HoursUnitPredictor(Integer unitTime, String description, Integer maxHistoricalDataInterval, Integer lagMakerMaxLag) {
         this.unitTime = unitTime;
         this.description = description;
-        this.maxLagQuery = maxLagQuery;
+        this.maxHistoricalDataInterval = maxHistoricalDataInterval;
         this.lagMakerMaxLag = lagMakerMaxLag;
     }
 
@@ -30,8 +30,8 @@ public enum HoursUnitPredictor implements TimeUnitPredictor {
     }
 
     @Override
-    public Integer getMaxLagQuery() {
-        return maxLagQuery;
+    public Integer getMaxHistoricalDataInterval() {
+        return maxHistoricalDataInterval;
     }
 
 

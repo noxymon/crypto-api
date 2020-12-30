@@ -53,7 +53,7 @@ public interface EtheriumMinutesRepository extends JpaRepository<TbEth, Timestam
                     "    avg(`tb_eth`.`tbe_close`) AS `tbe_close`" +
                     "from" +
                     "    `tb_eth` " +
-                    "WHERE `tbe_date` BETWEEN (:startTimestamp - interval :maxLag hour) AND :startTimestamp " +
+                    "WHERE `tbe_date` BETWEEN (:startTimestamp - interval (:maxLag+1) hour) AND :startTimestamp " +
                     "group by" +
                     "    floor(unix_timestamp(`tb_eth`.`tbe_date`) / (3600 * (:intervalHours + 1))) " +
                     "ORDER BY tbe_date ASC")

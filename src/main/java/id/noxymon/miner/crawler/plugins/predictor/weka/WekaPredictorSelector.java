@@ -75,21 +75,21 @@ public class WekaPredictorSelector implements MultiPredictor {
     private List<TbEth> fetchHistoricalData(MinutesUnitPredictor unitTimes) {
         return etheriumMinutesRepository.findRecordMinutePrediction(
                 Timestamp.valueOf(LocalDateTime.now()),
-                unitTimes.getMaxLagQuery(),
+                unitTimes.getMaxHistoricalDataInterval(),
                 unitTimes.getUnitTime());
     }
 
     private List<TbEth> fetchHistoricalData(DaysUnitPredictor unitTimes) {
         return etheriumMinutesRepository.findRecordDailyPrediction(
                 Timestamp.valueOf(LocalDateTime.now()),
-                unitTimes.getMaxLagQuery(),
+                unitTimes.getMaxHistoricalDataInterval(),
                 unitTimes.getUnitTime());
     }
 
     private List<TbEth> fetchHistoricalData(HoursUnitPredictor unitTimes) {
         return etheriumMinutesRepository.findRecordHourPrediction(
                 Timestamp.valueOf(LocalDateTime.now()),
-                unitTimes.getMaxLagQuery(),
+                unitTimes.getMaxHistoricalDataInterval(),
                 unitTimes.getUnitTime());
     }
 
