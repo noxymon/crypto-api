@@ -46,16 +46,16 @@ public interface EtheriumMinutesRepository extends JpaRepository<TbEth, Timestam
     @Transactional(readOnly = true)
     @Query(nativeQuery = true,
             value = "select " +
-                    "    `tb_eth`.`tbe_date` + interval :intervalHours hour AS `tbe_date`, " +
+                    "    `tb_eth`.`tbe_date` + interval 1 hour AS `tbe_date`, " +
                     "    avg(`tb_eth`.`tbe_open`) AS `tbe_open`," +
                     "    avg(`tb_eth`.`tbe_high`) AS `tbe_high`," +
                     "    avg(`tb_eth`.`tbe_low`) AS `tbe_low`," +
                     "    avg(`tb_eth`.`tbe_close`) AS `tbe_close`" +
                     "from" +
                     "    `tb_eth` " +
-                    "WHERE `tbe_date` BETWEEN (:startTimestamp - interval (:maxLag+1) hour) AND :startTimestamp " +
+                    "WHERE `tbe_date` BETWEEN (:startTimestamp - interval (:maxLag+1) day) AND :startTimestamp " +
                     "group by" +
-                    "    floor(unix_timestamp(`tb_eth`.`tbe_date`) / (3600 * (:intervalHours + 1))) " +
+                    "    floor(unix_timestamp(`tb_eth`.`tbe_date`) / (3600 * (:intervalHours))) " +
                     "ORDER BY tbe_date ASC")
     List<TbEth> findRecordHourPrediction(@Param("startTimestamp") Timestamp startTimestamp,
                                          @Param("maxLag") int maxLagInHour,
