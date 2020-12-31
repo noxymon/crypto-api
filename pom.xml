@@ -15,7 +15,7 @@
     <description>Etherium Crawler</description>
 
     <properties>
-        <java.version>1.8</java.version>
+        <java.version>11</java.version>
     </properties>
 
     <repositories>
@@ -158,8 +158,9 @@
                         <artifactId>native-image-maven-plugin</artifactId>
                         <version>20.3.0</version>
                         <configuration>
+                            <imageName>${project.artifactId}</imageName>
                             <mainClass>id.noxymon.miner.crawler.CrawlerHistoricalDataApplication</mainClass>
-                            <buildArgs>-Dspring.native.remove-yaml-support=true -Dspring.spel.ignore=true</buildArgs>
+                            <buildArgs>-J-Xmx8G -Dspring.graal.remove-unused-autoconfig=true -Dspring.graal.skip-logback=true -Dspring.native.remove-yaml-support=true -Dspring.spel.ignore=true -Dspring.native.remove-jmx-support=true -Dspring.native.remove-xml-support=true</buildArgs>
                         </configuration>
                         <executions>
                             <execution>
