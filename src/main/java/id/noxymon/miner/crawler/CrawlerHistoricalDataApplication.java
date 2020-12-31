@@ -7,7 +7,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableAsync
 @EnableScheduling
-@SpringBootApplication
+@SpringBootApplication(proxyBeanMethods = false)
 public class CrawlerHistoricalDataApplication {
 
     public static void main(String[] args) {
