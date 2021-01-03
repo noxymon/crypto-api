@@ -4,4 +4,5 @@ public interface TimeUnitPredictor {
     Integer getUnitTime();
     Integer getLagMakerMaxLag();
     Integer getMaxHistoricalDataInterval();
+    Integer getCorrectionTime();
 }

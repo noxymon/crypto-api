@@ -56,7 +56,7 @@ public class WekaPredictorSelector implements MultiPredictor {
         WekaForecaster forecaster = buildForecaster(dataset, linearRegression, unitTimes.getLagMakerMaxLag());
         forecaster.primeForecaster(dataset);
 
-        return composeNumericPredictionList(step, forecaster);
+        return composeNumericPredictionList(step, forecaster, unitTimes);
     }
 
     private List<TbEth> getHistoricalData(TimeUnitPredictor unitTimes) {
@@ -121,7 +121,8 @@ public class WekaPredictorSelector implements MultiPredictor {
         return linearRegression;
     }
 
-    private List<PricePrediction> composeNumericPredictionList(int step, WekaForecaster forecaster) throws Exception {
+    private List<PricePrediction> composeNumericPredictionList(int step, WekaForecaster forecaster,
+                                                               TimeUnitPredictor timeUnit) throws Exception {
         TSLagMaker tsLagMaker = forecaster.getTSLagMaker();
         long currentTimeStampValue = (long)tsLagMaker.getCurrentTimeStampValue();
         log.info("epoch in ms : " + currentTimeStampValue);
@@ -132,8 +133,12 @@ public class WekaPredictorSelector implements MultiPredictor {
             LocalDateTime advancedLocalDateTime = getLocalDateTimeFromEpoch(advancedTimestampEpoch);
 
             PricePrediction pricePrediction = new PricePrediction(
-                    numericPredictions.get(3).predicted(),
-                    advancedLocalDateTime.truncatedTo(ChronoUnit.MINUTES)
+                    numericPredictions
+                            .get(3)
+                            .predicted(),
+                    advancedLocalDateTime
+                            .truncatedTo(ChronoUnit.MINUTES)
+                            .minusMinutes(timeUnit.getCorrectionTime())
             );
             numericPredictionList.add(pricePrediction);
 
