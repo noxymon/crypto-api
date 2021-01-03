@@ -17,6 +17,8 @@ import weka.classifiers.timeseries.WekaForecaster;
 import weka.core.*;
 import weka.filters.supervised.attribute.TSLagMaker;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.time.Instant;
@@ -31,13 +33,14 @@ import java.util.List;
 @Service
 public class WekaPredictorSelector implements MultiPredictor {
 
-    private final ZoneId zone = ZoneId.of("Asia/Jakarta");
-    private final Attribute low = new Attribute("low");
-    private final Attribute open = new Attribute("open");
-    private final Attribute high = new Attribute("high");
-    private final Attribute close = new Attribute("close");
-    private final Attribute date = new Attribute("date", "yyyy-MM-dd'T'HH:mm");
-    private final ArrayList<Attribute> attributeList  = new ArrayList<>(Arrays.asList(date, open, high, low, close));
+    private static final ZoneId zone = ZoneId.of("Asia/Jakarta");
+    private static final String serializedForecasterName = "_forecaster.model";
+    private static final Attribute low = new Attribute("low");
+    private static final Attribute open = new Attribute("open");
+    private static final Attribute high = new Attribute("high");
+    private static final Attribute close = new Attribute("close");
+    private static final Attribute date = new Attribute("date", "yyyy-MM-dd'T'HH:mm");
+    private static final ArrayList<Attribute> attributeList  = new ArrayList<>(Arrays.asList(date, open, high, low, close));
 
     private final EtheriumMinutesRepository etheriumMinutesRepository;
 
@@ -52,11 +55,26 @@ public class WekaPredictorSelector implements MultiPredictor {
         Instances dataset = composeDataset(unitTimes.getUnitTime(), historicalData);
 
         LinearRegression linearRegression = buildLinearRegression(dataset);
-
-        WekaForecaster forecaster = buildForecaster(dataset, linearRegression, unitTimes.getLagMakerMaxLag());
-        forecaster.primeForecaster(dataset);
+        WekaForecaster forecaster = loadAndPrepareWekaForecaster(unitTimes, dataset, linearRegression);
 
         return composeNumericPredictionList(step, forecaster, unitTimes);
+    }
+
+    private WekaForecaster loadAndPrepareWekaForecaster(TimeUnitPredictor unitTimes, Instances dataset,
+                                                        LinearRegression linearRegression) throws Exception {
+        WekaForecaster forecaster;
+        if(Files.exists(Path.of(unitTimes + serializedForecasterName))){
+            forecaster = (WekaForecaster) SerializationHelper.read(unitTimes + serializedForecasterName);
+            forecaster.primeForecaster(composeEmptyDataset(unitTimes.getUnitTime()));
+            for (Instance instance : dataset) {
+                forecaster.primeForecasterIncremental(instance);
+            }
+        }else{
+            forecaster = buildForecaster(dataset, linearRegression, unitTimes.getLagMakerMaxLag());
+            forecaster.primeForecaster(dataset);
+        }
+        SerializationHelper.write(unitTimes + serializedForecasterName, forecaster);
+        return forecaster;
     }
 
     private List<TbEth> getHistoricalData(TimeUnitPredictor unitTimes) {
@@ -167,6 +185,12 @@ public class WekaPredictorSelector implements MultiPredictor {
                     Instance minuteInstance = mapRecordToInstance(averagePerMinute);
                     dataset.add(minuteInstance);
                 });
+        return dataset;
+    }
+
+    private Instances composeEmptyDataset(int unitMinutes) {
+        Instances dataset = new Instances(unitMinutes +" minutes etherium", attributeList, 0);
+        dataset.setClass(close);
         return dataset;
     }
 
