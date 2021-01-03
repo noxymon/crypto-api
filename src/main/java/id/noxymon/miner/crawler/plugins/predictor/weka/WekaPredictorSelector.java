@@ -128,7 +128,8 @@ public class WekaPredictorSelector implements MultiPredictor {
 
         List<PricePrediction> numericPredictionList = new ArrayList<>();
         for (List<NumericPrediction> numericPredictions : forecaster.forecast(step, System.out)) {
-            LocalDateTime advancedLocalDateTime = getAdvancedLocalDateTime(tsLagMaker, currentTimeStampValue);
+            long advancedTimestampEpoch = getAdvancedTimestampEpoch(tsLagMaker, currentTimeStampValue);
+            LocalDateTime advancedLocalDateTime = getLocalDateTimeFromEpoch(advancedTimestampEpoch);
 
             PricePrediction pricePrediction = new PricePrediction(
                     numericPredictions.get(3).predicted(),
@@ -136,14 +137,9 @@ public class WekaPredictorSelector implements MultiPredictor {
             );
             numericPredictionList.add(pricePrediction);
 
-            currentTimeStampValue = getAdvancedTimestampEpoch(tsLagMaker, currentTimeStampValue);
+            currentTimeStampValue = advancedTimestampEpoch;
         }
         return numericPredictionList;
-    }
-
-    private LocalDateTime getAdvancedLocalDateTime(TSLagMaker tsLagMaker, long currentTimeStampValue) {
-        long advancedTimestampEpoch = getAdvancedTimestampEpoch(tsLagMaker, currentTimeStampValue);
-        return getLocalDateTimeFromEpoch(advancedTimestampEpoch);
     }
 
     private long getAdvancedTimestampEpoch(TSLagMaker tsLagMaker, long currentTimeStampValue) {
