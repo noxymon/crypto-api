@@ -48,7 +48,9 @@ public class SimpleCommander implements BuyOrSellCommander {
             if(lastBuyEvent.isPresent()){
                 final double currentPrice = lastMinutePrice.getTbeClose().doubleValue();
                 final double estimateCurrentBitCoin = assetInfo.getMoneyBalance() / currentPrice;
-                if(estimateCurrentBitCoin > lastBuyEvent.get().getEventPriceBitcoin().get()){
+                final Double lastBuyBitcoin = lastBuyEvent.get().getEventPriceBitcoin().get();
+                final double increment = (lastBuyBitcoin - estimateCurrentBitCoin)/lastBuyBitcoin;
+                if(increment >= 0.25){
                     mTrader.buyCoin("ETH", "IDR", assetInfo.getMoneyBalance(), currentPrice);
                     mMessageSender.sendMessage(sendMessageOf(currentPrice, estimateCurrentBitCoin), "noxymon");
                 }
