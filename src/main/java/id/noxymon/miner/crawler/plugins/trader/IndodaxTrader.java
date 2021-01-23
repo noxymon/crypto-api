@@ -4,7 +4,6 @@ import static id.noxymon.miner.crawler.utils.NumberUtil.from;
 
 import id.noxymon.miner.crawler.plugins.trader.models.AssetInfoResponseModel;
 import id.noxymon.miner.crawler.plugins.trader.models.HistoryOrderResponseModel;
-import id.noxymon.miner.crawler.plugins.trader.models.HistoryOrderReturnModel;
 import id.noxymon.miner.crawler.plugins.trader.models.HistoryOrderReturnTradeModel;
 import id.noxymon.miner.crawler.plugins.trader.models.TradeResponseModel;
 import id.noxymon.miner.crawler.services.trader.Trader;
@@ -13,7 +12,6 @@ import id.noxymon.miner.crawler.services.trader.models.BitcoinBalanceInfo;
 import id.noxymon.miner.crawler.services.trader.models.TradeEvent;
 import id.noxymon.miner.crawler.utils.EventEnum;
 import id.noxymon.miner.crawler.utils.HmacUtil;
-import id.noxymon.miner.crawler.utils.NumberUtil;
 import id.noxymon.miner.crawler.utils.QueryUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,14 +25,9 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -213,7 +206,7 @@ public class IndodaxTrader implements Trader {
 
         BitcoinBalanceInfo bitcoinBalanceInfo = new BitcoinBalanceInfo(
                 "eth",
-                assetInfoResponseModel.getMReturn().getBalance().getBtc()
+                assetInfoResponseModel.getMReturn().getBalance().getEth()
         );
         return new AssetInfo(
                 assetInfoResponseModel.getMReturn().getBalance().getIdr(),
