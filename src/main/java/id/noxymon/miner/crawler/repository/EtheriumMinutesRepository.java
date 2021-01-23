@@ -78,4 +78,15 @@ public interface EtheriumMinutesRepository extends JpaRepository<TbEth, Timestam
     List<TbEth> findRecordDailyPrediction(@Param("startTimestamp") Timestamp startTimestamp,
                                           @Param("maxLag") int maxLagInHour,
                                           @Param("intervalDays") int intervalDays);
+
+    @Query(nativeQuery = true,
+            value = "select " +
+                    "   * " +
+                    "from" +
+                    "   tb_eth te " +
+                    "where" +
+                    "   tbe_date = date_format(now()-interval 1 minute, '%Y-%m-%d %H:%i:00') " +
+                    "limit 1")
+    @Transactional(readOnly = true)
+    TbEth findLastMinutePrice();
 }
