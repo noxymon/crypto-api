@@ -1,5 +1,6 @@
 package id.noxymon.miner.crawler.handler;
 
+import id.noxymon.miner.crawler.services.decisions.BuyOrSellCommander;
 import id.noxymon.miner.crawler.services.fetcher.FetcherData;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,10 @@ public class ScheduledDataFetcher {
     @Qualifier("indodaxApiFetcher")
     private FetcherData fetcherData;
 
+    @Autowired
+    @Qualifier("simpleCommander")
+    private BuyOrSellCommander tradeCommander;
+
     @Value("${application.prediction.enable}")
     private boolean enablePrediction;
 
@@ -30,6 +35,11 @@ public class ScheduledDataFetcher {
     @Scheduled(cron = "${application.crawler.cron}")
     public void execute(){
         fetcherData.fetchData("ETHIDR", LocalDateTime.now());
+        try {
+            tradeCommander.decideBuyOrSell();
+        } catch (Exception e) {
+            log.error("Error thrown !" + e.getMessage());
+        }
 
         if(enablePrediction){
             predictorDataSaver.updatePrediction();
