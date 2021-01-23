@@ -5,5 +5,5 @@ import lombok.Getter;
 @Getter
 public class AssetInfoBalanceModel {
     private Double idr;
-    private Double btc;
+    private Double eth;
 }
