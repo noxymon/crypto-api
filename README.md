@@ -36,7 +36,7 @@ After building the project, you can run it using the following command:
 java -jar target/crypto-api-0.0.1-SNAPSHOT.jar
 ```
 
-This will start the Spring Boot application. You can then interact with the application via the exposed REST APIs.
+This will start the Spring Boot application.
 
 ## Contributing
 
